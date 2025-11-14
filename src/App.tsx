@@ -41,7 +41,7 @@ type JoinFormState = {
 };
 
 const defaultHostForm: HostFormState = {
-  creatorName: "Avery Creator",
+  creatorName: "Bandwagon Host",
   inviteMode: "OPEN",
   timerSeconds: 45,
   generalRoundCount: 3,
@@ -159,7 +159,7 @@ function App() {
     }, {});
   }, [currentRound, roundResponses]);
 
-  const questionOptions = (question?: Question) =>
+const questionOptions = (question?: Question) =>
     question
       ? [
           { id: "A", label: question.optionA },
@@ -521,13 +521,52 @@ function App() {
         <div className="app-shell">
           <header className="hero">
             <div>
-              <p className="eyebrow">Opinionated People</p>
-              <h1>Predict the crowd, not yourself.</h1>
-              <p className="lede">Host a social deduction show or join one in progress. Railway-ready API + WebSocket backend keeps everything in sync.</p>
+              <p className="eyebrow">Bandwagon</p>
+              <h1>Jump on the Bandwagon.</h1>
+              <p className="lede">
+                The social prediction game where you never vote for your favorite—you predict the majority. Part psychology, part strategy,
+                pure social fun. Spin up a lobby, invite at least four friends, and crown the best crowd reader.
+              </p>
             </div>
           </header>
           {notice && <p className="banner">{notice}</p>}
           {renderLanding()}
+          <section className="grid">
+            <div className="panel wide">
+              <div className="panel-header">
+                <div>
+                  <p className="eyebrow">How Bandwagon Works</p>
+                  <h2>Part strategy, part social experiment</h2>
+                </div>
+              </div>
+              <div className="how-grid">
+                <article>
+                  <h3>Setup</h3>
+                  <ul>
+                    <li>Host starts a game & invites at least four friends</li>
+                    <li>Pick questions from the bank & optionally add a prize</li>
+                    <li>Everyone receives the same questions in order</li>
+                  </ul>
+                </article>
+                <article>
+                  <h3>Gameplay</h3>
+                  <ul>
+                    <li>30-60 seconds to choose the answer you think most people will pick</li>
+                    <li>Majority scorers earn 1 point; minority gets zero</li>
+                    <li>Predict psychology, not personal favorites</li>
+                  </ul>
+                </article>
+                <article>
+                  <h3>Winning</h3>
+                  <ul>
+                    <li>Top scorers advance to finals; others become voters</li>
+                    <li>Finalists face elimination—one wrong answer and you&apos;re out</li>
+                    <li>Last predictor standing wins bragging rights and the cash pot</li>
+                  </ul>
+                </article>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     );
@@ -547,8 +586,8 @@ function App() {
       <div className="app-shell">
         <header className="hero">
           <div>
-            <p className="eyebrow">Game code · {game.code}</p>
-            <h1>Opinionated People</h1>
+            <p className="eyebrow">Bandwagon Code · {game.code}</p>
+            <h1>Bandwagon Control Deck</h1>
             <p className="lede">Status: {game.status}. Share code {game.code} or send invites directly.</p>
             <div className="hero-stats">
               <div className="stat-tile">
@@ -568,7 +607,7 @@ function App() {
           <div className="prize-board">
             <p className="eyebrow">You are playing as</p>
             <strong>{me?.user.username ?? "Player"}</strong>
-            <p>{me?.isCreator ? "Host controls unlocked" : "Answer as the crowd would"}</p>
+            <p>{me?.isCreator ? "Host controls unlocked" : "Answer the way the crowd will"}</p>
             <div className="spotlights" />
             <button className="ghost" onClick={handleLeave}>
               Leave session
@@ -599,6 +638,7 @@ function App() {
                     </div>
                   ))}
                 </div>
+                <ShareTools gameCode={game.code} />
               </div>
               <div className="panel admin-panel">
                 <div className="panel-header">
@@ -674,7 +714,7 @@ function App() {
             <div className="panel-header">
               <div>
                 <p className="eyebrow">Question Bank</p>
-                <h2>Tonight's prompts</h2>
+                <h2>Bandwagon prompts</h2>
                 <p className="tip">Players see these in the order below. Finals = last card.</p>
               </div>
             </div>
@@ -691,7 +731,7 @@ function App() {
             <div className="panel-header">
               <div>
                 <p className="eyebrow">Player Roster</p>
-                <h2>Who&apos;s in the room</h2>
+                <h2>Who&apos;s on the Bandwagon</h2>
                 <p className="tip">Everyone plays the general rounds. Finals promote the top predictors.</p>
               </div>
             </div>
@@ -807,3 +847,39 @@ function App() {
 }
 
 export default App;
+
+type ShareToolsProps = {
+  gameCode: string;
+};
+
+const ShareTools = ({ gameCode }: ShareToolsProps) => {
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://bandwagon.game";
+  const link = `${origin}?code=${gameCode}`;
+  const message = `Join my Bandwagon game! Use code ${gameCode} to predict the crowd.`;
+  const smsHref = `sms:?&body=${encodeURIComponent(`${message} ${link}`)}`;
+  const emailHref = `mailto:?subject=${encodeURIComponent("Join my Bandwagon game")}&body=${encodeURIComponent(`${message} ${link}`)}`;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(`${message} ${link}`);
+      window.alert("Share link copied!");
+    } catch {
+      window.alert("Copy not available, try selecting the link manually.");
+    }
+  };
+
+  return (
+    <div className="share-tools">
+      <p className="eyebrow">Share Bandwagon</p>
+      <p className="tip">Text, email, or copy the lobby link so players can hop on fast.</p>
+      <div className="share-buttons">
+        <button type="button" onClick={handleCopy}>
+          Copy link
+        </button>
+        <a href={smsHref}>Text invite</a>
+        <a href={emailHref}>Email invite</a>
+      </div>
+      <code>{link}</code>
+    </div>
+  );
+};
