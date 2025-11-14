@@ -1,42 +1,115 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
+:root {
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #101828;
+  background-color: #f9fafb;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 2rem;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
 }
 
 .card {
-  padding: 2em;
+  width: min(480px, 100%);
+  background: #fff;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.1);
+  text-align: center;
 }
 
-.read-the-docs {
-  color: #888;
+.card h1 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.card p {
+  margin-top: 0;
+  color: #475467;
+}
+
+.card button {
+  border: none;
+  padding: 0.9rem 1.8rem;
+  font-size: 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #2563eb, #9333ea);
+  color: #fff;
+  transition: transform 200ms ease;
+}
+
+.card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.card button:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+.timer {
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
+.timer__label {
+  margin: 0 0 0.25rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #475467;
+}
+
+.timer__progress {
+  position: relative;
+  width: 100%;
+  height: 18px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.timer__progress-bar {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #f97316, #ef4444);
+  transition: width 200ms linear;
+}
+
+.timer__value {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  line-height: 18px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.event-log {
+  margin-top: 1.5rem;
+  text-align: left;
+  font-size: 0.9rem;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.event-log ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.event-log li + li {
+  margin-top: 0.35rem;
 }
