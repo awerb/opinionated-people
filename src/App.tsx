@@ -192,6 +192,7 @@ function App() {
   const [inviteContact, setInviteContact] = useState("");
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [landingTab, setLandingTab] = useState<"host" | "player" | "about">("host");
 
   const currentRound: GameRound | null = useMemo(() => {
     if (!game) return null;
@@ -533,7 +534,19 @@ const questionOptions = (question?: Question) =>
           </div>
         </div>
       </section>
-      <section className="grid" id="host-setup">
+      <div className="landing-tabs">
+        <button type="button" className={landingTab === "host" ? "active" : ""} onClick={() => setLandingTab("host")}>
+          Host
+        </button>
+        <button type="button" className={landingTab === "player" ? "active" : ""} onClick={() => setLandingTab("player")}>
+          Player
+        </button>
+        <button type="button" className={landingTab === "about" ? "active" : ""} onClick={() => setLandingTab("about")}>
+          About
+        </button>
+      </div>
+      {landingTab === "host" && (
+        <section className="grid" id="host-setup">
         <form className="panel wide" onSubmit={handleCreateGame}>
         <div className="panel-header">
           <div>
@@ -658,6 +671,103 @@ const questionOptions = (question?: Question) =>
         </button>
       </form>
     </section>
+      )}
+      {landingTab === "player" && (
+        <section className="grid">
+          <div className="panel wide">
+            <div className="panel-header">
+              <div>
+                <p className="eyebrow">Player Lobby</p>
+                <h2>Jump onto the Bandwagon</h2>
+                <p className="tip">Bring the code your host gave you and predict like the crowd.</p>
+              </div>
+            </div>
+            <div className="player-how">
+              <article>
+                <h3>Join fast</h3>
+                <ul>
+                  <li>Tap “Join lobby” and enter the 6-letter code</li>
+                  <li>Pick a fun nickname and confirm</li>
+                  <li>Watch for the host to start the round</li>
+                </ul>
+              </article>
+              <article>
+                <h3>Play smart</h3>
+                <ul>
+                  <li>You’re not voting for yourself—you’re guessing the majority</li>
+                  <li>30–60 seconds per question, so trust your gut</li>
+                  <li>If you fall behind, cheer on finalists as a voter</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+          <form className="panel" onSubmit={handleJoinGame}>
+            <div className="panel-header">
+              <div>
+                <p className="eyebrow">Join Game</p>
+                <h2>Enter lobby details</h2>
+              </div>
+            </div>
+            <label className="field">
+              <span>Display name</span>
+              <input value={joinForm.username} onChange={(event) => setJoinForm((prev) => ({ ...prev, username: event.target.value }))} />
+            </label>
+            <label className="field">
+              <span>Lobby code</span>
+              <input
+                value={joinForm.code}
+                onChange={(event) => setJoinForm((prev) => ({ ...prev, code: event.target.value.toUpperCase() }))}
+              />
+            </label>
+            <label className="field">
+              <span>Invite ID (optional)</span>
+              <input value={joinForm.inviteId} onChange={(event) => setJoinForm((prev) => ({ ...prev, inviteId: event.target.value }))} />
+            </label>
+            <button type="submit" disabled={loading}>
+              {loading ? "Joining..." : "Join lobby"}
+            </button>
+          </form>
+        </section>
+      )}
+      {landingTab === "about" && (
+        <section className="grid">
+          <div className="panel wide">
+            <div className="panel-header">
+              <div>
+                <p className="eyebrow">About Bandwagon</p>
+                <h2>Why predict the crowd?</h2>
+                <p className="tip">A quick tour of the show flow.</p>
+              </div>
+            </div>
+            <div className="how-grid">
+              <article>
+                <h3>Setup</h3>
+                <ul>
+                  <li>Host invites 4+ players and curates the question stack</li>
+                  <li>Optionally add a prize pool and timer length</li>
+                  <li>Players hop in via share link or lobby code</li>
+                </ul>
+              </article>
+              <article>
+                <h3>Gameplay</h3>
+                <ul>
+                  <li>Questions show four options — tap what you expect the majority to pick</li>
+                  <li>Majority scorers get 1 point, minority earns zero</li>
+                  <li>Timer forces fast instincts: 30–60 seconds</li>
+                </ul>
+              </article>
+              <article>
+                <h3>Winning</h3>
+                <ul>
+                  <li>Top predictors after general rounds become finalists</li>
+                  <li>Finalists battle elimination style while voters spectate</li>
+                  <li>Last predictor standing wins cash + bragging rights</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+        </section>
+      )}
     </>
   );
 
