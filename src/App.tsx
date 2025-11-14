@@ -1,19 +1,9 @@
-function App() {
-  const handleStart = () => {
-    console.log("Start game clicked");
-  };
+import Dashboard from "./frontend/pages/Dashboard";
+import "./frontend/components/components.css";
+import "./App.css";
 
-  return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ textAlign: "center" }}>
-        <h1>Opinionated People</h1>
-        <p>Prototype build</p>
-        <button onClick={handleStart} style={{ padding: "1rem 2rem", fontSize: "1.1rem", marginTop: "1rem" }}>
-          Start Game
-        </button>
-      </div>
-    </div>
-  );
+function App() {
+  return <Dashboard />;
 }
 
 export default App;
