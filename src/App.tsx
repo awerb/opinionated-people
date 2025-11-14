@@ -1,17 +1,15 @@
 import type { CSSProperties } from "react";
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
-import type { GameInvitation, GameParticipant, GameRound, GameState, InviteMode, Question } from "./api";
+import type { GameParticipant, GameRound, GameState, InviteMode, Question } from "./api";
 import {
   API_BASE,
   advanceGame,
   createGame,
-  createInvite,
   fetchGame,
   fetchQuestions,
   finalizeRound,
   joinGame,
-  remindInvite,
   startGame,
   submitResponse,
 } from "./api";
@@ -189,10 +187,10 @@ function App() {
   const [questions, setQuestions] = useState<Question[]>(fallbackQuestions);
   const [hostForm, setHostForm] = useState<HostFormState>(defaultHostForm);
   const [joinForm, setJoinForm] = useState<JoinFormState>(defaultJoinForm);
-  const [inviteContact, setInviteContact] = useState("");
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [landingTab, setLandingTab] = useState<"host" | "player" | "about">("host");
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
   const currentRound: GameRound | null = useMemo(() => {
     if (!game) return null;
@@ -223,15 +221,6 @@ function App() {
     if (!game) return [];
     return [...game.participants].sort((a, b) => b.totalPoints - a.totalPoints || a.user.username.localeCompare(b.user.username));
   }, [game]);
-
-  const inviteStats = useMemo(() => {
-    const sent = game?.invitations.length ?? 0;
-    const accepted = game?.invitations.filter((invite) => invite.status === "ACCEPTED").length ?? 0;
-    const pending = sent - accepted;
-    return { sent, accepted, pending };
-  }, [game]);
-
-  const pendingInvites = useMemo(() => game?.invitations.filter((invite) => invite.status === "PENDING") ?? [], [game]);
 
   const finalsReady = game?.status === "CHAMPIONSHIP" || leaderboard.some((player) => player.isFinalist);
 
@@ -271,15 +260,15 @@ const questionOptions = (question?: Question) =>
         key: "prelaunch",
         title: "Pre-Launch",
         value: game.status === "LOBBY" ? "Configuring" : "Complete",
-        detail: game.status === "LOBBY" ? "Tweak settings & invites" : "Lobby ready",
+        detail: game.status === "LOBBY" ? "Share link to invite" : "Lobby ready",
         status: game.status === "LOBBY" ? "active" : "complete",
       },
       {
-        key: "invites",
-        title: "Invites",
-        value: `${inviteStats.sent} sent`,
-        detail: `${inviteStats.accepted} joined`,
-        status: inviteStats.accepted >= 4 ? "complete" : inviteStats.sent > 0 ? "active" : "pending",
+        key: "players",
+        title: "Players",
+        value: `${game.participants.length} joined`,
+        detail: game.participants.length >= 4 ? "Ready to start" : "Need 4+ to play",
+        status: game.participants.length >= 4 ? "complete" : game.participants.length > 0 ? "active" : "pending",
       },
       {
         key: "rounds",
@@ -302,11 +291,37 @@ const questionOptions = (question?: Question) =>
         status: game.status === "COMPLETE" ? "complete" : finalsReady ? "active" : "pending",
       },
     ];
-  }, [game, inviteStats, currentRound, completedRounds, finalsReady, timeLeft]);
+  }, [game, currentRound, completedRounds, finalsReady, timeLeft]);
 
   const syncGame = async (identifier: string) => {
     const next = await fetchGame(identifier);
     setGame(next);
+  };
+
+  const handleQuickStart = async () => {
+    try {
+      setLoading(true);
+      setNotice(null);
+      // Use default form settings with first 4 questions
+      const quickStartConfig: HostFormState = {
+        ...defaultHostForm,
+        questionIds: questions.slice(0, 4).map((q) => q.id),
+      };
+      const payload = await createGame(quickStartConfig);
+      const nextSession: Session = {
+        gameId: payload.gameId,
+        participantId: payload.participantId,
+        code: payload.code,
+      };
+      setSession(nextSession);
+      writeSession(nextSession);
+      await syncGame(payload.gameId);
+      setNotice("Game created — share the code to invite players.");
+    } catch (error) {
+      setNotice((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCreateGame = async (event: React.FormEvent) => {
@@ -333,6 +348,11 @@ const questionOptions = (question?: Question) =>
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSelectRecommended = () => {
+    const recommended = questions.slice(0, hostForm.generalRoundCount + 1).map((q) => q.id);
+    setHostForm((prev) => ({ ...prev, questionIds: recommended }));
   };
 
   const handleJoinGame = async (event: React.FormEvent) => {
@@ -414,29 +434,15 @@ const questionOptions = (question?: Question) =>
     }
   };
 
-  const handleCreateInvite = async (contact: string) => {
-    if (!session || !contact.trim()) return;
-    try {
-      await createInvite(session.gameId, {
-        inviteeContact: contact,
-        inviterParticipantId: session.participantId,
-      });
-      await syncGame(session.gameId);
-    } catch (error) {
-      setNotice((error as Error).message);
+  // Detect URL parameters for share links
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    if (code && !session) {
+      setJoinForm((prev) => ({ ...prev, code: code.toUpperCase() }));
+      setLandingTab('player');
     }
-  };
-
-  const handleReminder = async (invite: GameInvitation) => {
-    if (!session) return;
-    try {
-      await remindInvite(invite.id);
-      await syncGame(session.gameId);
-      setNotice(`Reminder sent to ${invite.inviteeContact}`);
-    } catch (error) {
-      setNotice((error as Error).message);
-    }
-  };
+  }, [session]);
 
   useEffect(() => {
     fetchQuestions()
@@ -454,7 +460,7 @@ const questionOptions = (question?: Question) =>
       .catch(() => {
         setQuestions(fallbackQuestions);
         setHostForm((prev) => ({ ...prev, questionIds: fallbackQuestions.slice(0, prev.generalRoundCount + 1).map((question) => question.id) }));
-        setNotice("Couldn’t reach the question bank, showing sample prompts instead.");
+        setNotice("Couldn't reach the question bank, showing sample prompts instead.");
       });
   }, []);
 
@@ -499,14 +505,17 @@ const questionOptions = (question?: Question) =>
           </div>
           <small className="xp-label">XP to level 4</small>
           <div className="hero-actions">
-            <button type="button" onClick={() => scrollTo("host-setup")}>
-              Start new game
+            <button type="button" className="primary-cta" onClick={handleQuickStart} disabled={loading}>
+              {loading ? "Creating..." : "Create Game Now"}
             </button>
             <button type="button" className="secondary" onClick={() => scrollTo("join-panel")}>
               Join with code
             </button>
-            <button type="button" className="ghost" onClick={() => setNotice("Quick match is coming soon!")}>
-              Quick match
+            <button type="button" className="ghost" onClick={() => {
+              setShowAdvancedSettings(true);
+              scrollTo("host-setup");
+            }}>
+              Advanced Setup
             </button>
           </div>
         </div>
@@ -551,94 +560,120 @@ const questionOptions = (question?: Question) =>
         <div className="panel-header">
           <div>
             <p className="eyebrow">Host A Game</p>
-            <h2>Create a show</h2>
-            <p className="tip">Pick questions, set the pace, and share the lobby code.</p>
+            <h2>Custom game setup</h2>
+            <p className="tip">Fine-tune your game settings or use the "Create Game Now" button above for instant setup.</p>
           </div>
         </div>
-        <div className="config-grid">
-          <label className="field">
-            <span>Creator name</span>
-            <input
-              value={hostForm.creatorName}
-              onChange={(event) => setHostForm((prev) => ({ ...prev, creatorName: event.target.value }))}
-            />
-          </label>
-          <label className="field">
-            <span>Invite mode</span>
-            <select
-              value={hostForm.inviteMode}
-              onChange={(event) => setHostForm((prev) => ({ ...prev, inviteMode: event.target.value as InviteMode }))}
-            >
-              <option value="LOCKED">Locked — only creator can invite</option>
-              <option value="OPEN">Open — viral invites on</option>
-            </select>
-          </label>
-          <label className="field">
-            <span>Timer (seconds)</span>
-            <input
-              type="number"
-              min={20}
-              max={90}
-              value={hostForm.timerSeconds}
-              onChange={(event) => setHostForm((prev) => ({ ...prev, timerSeconds: Number(event.target.value) }))}
-            />
-          </label>
-          <label className="field">
-            <span>General rounds</span>
-            <input
-              type="number"
-              min={1}
-              max={5}
-              value={hostForm.generalRoundCount}
-              onChange={(event) => setHostForm((prev) => ({ ...prev, generalRoundCount: Number(event.target.value) }))}
-            />
-          </label>
-          <label className="field">
-            <span>Finalist slots</span>
-            <input
-              type="number"
-              min={2}
-              max={6}
-              value={hostForm.finalistCount}
-              onChange={(event) => setHostForm((prev) => ({ ...prev, finalistCount: Number(event.target.value) }))}
-            />
-          </label>
-          <label className="field">
-            <span>Prize pool</span>
-            <input
-              type="number"
-              min={0}
-              value={hostForm.prizeAmount}
-              onChange={(event) => setHostForm((prev) => ({ ...prev, prizeAmount: Number(event.target.value) }))}
-            />
-          </label>
+
+        <div className="advanced-toggle">
+          <button
+            type="button"
+            className="toggle-button"
+            onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
+          >
+            {showAdvancedSettings ? "Hide" : "Show"} Advanced Settings
+          </button>
         </div>
-        <div className="question-list">
-          {questions.map((question) => (
-            <label key={question.id} className="question-item">
+
+        {showAdvancedSettings && (
+          <div className="config-grid">
+            <label className="field">
+              <span>Creator name</span>
               <input
-                type="checkbox"
-                checked={hostForm.questionIds.includes(question.id)}
-                onChange={() => {
-                  setHostForm((prev) => {
-                    const exists = prev.questionIds.includes(question.id);
-                    if (exists) {
-                      return { ...prev, questionIds: prev.questionIds.filter((id) => id !== question.id) };
-                    }
-                    return { ...prev, questionIds: [...prev.questionIds, question.id] };
-                  });
-                }}
+                value={hostForm.creatorName}
+                onChange={(event) => setHostForm((prev) => ({ ...prev, creatorName: event.target.value }))}
               />
-              <div>
-                <p className="question-category">{question.category}</p>
-                <p className="question-text">{question.text}</p>
-              </div>
             </label>
-          ))}
+            <label className="field">
+              <span>Invite mode</span>
+              <select
+                value={hostForm.inviteMode}
+                onChange={(event) => setHostForm((prev) => ({ ...prev, inviteMode: event.target.value as InviteMode }))}
+              >
+                <option value="LOCKED">Locked — only creator can invite</option>
+                <option value="OPEN">Open — viral invites on</option>
+              </select>
+            </label>
+            <label className="field">
+              <span>Timer (seconds)</span>
+              <input
+                type="number"
+                min={20}
+                max={90}
+                value={hostForm.timerSeconds}
+                onChange={(event) => setHostForm((prev) => ({ ...prev, timerSeconds: Number(event.target.value) }))}
+              />
+            </label>
+            <label className="field">
+              <span>General rounds</span>
+              <input
+                type="number"
+                min={1}
+                max={5}
+                value={hostForm.generalRoundCount}
+                onChange={(event) => setHostForm((prev) => ({ ...prev, generalRoundCount: Number(event.target.value) }))}
+              />
+            </label>
+            <label className="field">
+              <span>Finalist slots</span>
+              <input
+                type="number"
+                min={2}
+                max={6}
+                value={hostForm.finalistCount}
+                onChange={(event) => setHostForm((prev) => ({ ...prev, finalistCount: Number(event.target.value) }))}
+              />
+            </label>
+            <label className="field">
+              <span>Prize pool</span>
+              <input
+                type="number"
+                min={0}
+                value={hostForm.prizeAmount}
+                onChange={(event) => setHostForm((prev) => ({ ...prev, prizeAmount: Number(event.target.value) }))}
+              />
+            </label>
+          </div>
+        )}
+
+        <div className="question-section">
+          <div className="question-header">
+            <h3>Question Selection</h3>
+            <button
+              type="button"
+              className="select-recommended"
+              onClick={handleSelectRecommended}
+            >
+              Select Recommended ({hostForm.generalRoundCount + 1})
+            </button>
+          </div>
+          <div className="question-list">
+            {questions.map((question) => (
+              <label key={question.id} className="question-item">
+                <input
+                  type="checkbox"
+                  checked={hostForm.questionIds.includes(question.id)}
+                  onChange={() => {
+                    setHostForm((prev) => {
+                      const exists = prev.questionIds.includes(question.id);
+                      if (exists) {
+                        return { ...prev, questionIds: prev.questionIds.filter((id) => id !== question.id) };
+                      }
+                      return { ...prev, questionIds: [...prev.questionIds, question.id] };
+                    });
+                  }}
+                />
+                <div>
+                  <p className="question-category">{question.category}</p>
+                  <p className="question-text">{question.text}</p>
+                </div>
+              </label>
+            ))}
+          </div>
         </div>
         <div className="config-actions">
           <button type="submit" disabled={loading}>
-            {loading ? "Creating..." : "Spin up lobby"}
+            {loading ? "Creating..." : "Create Custom Game"}
           </button>
         </div>
       </form>
@@ -851,7 +886,7 @@ const questionOptions = (question?: Question) =>
           <div>
             <p className="eyebrow">Bandwagon Code · {game.code}</p>
             <h1>Bandwagon Control Deck</h1>
-            <p className="lede">Status: {game.status}. Share code {game.code} or send invites directly.</p>
+            <p className="lede">Status: {game.status}. Share the game link to invite players.</p>
             <div className="hero-stats">
               <div className="stat-tile">
                 <p className="stat-label">Players</p>
@@ -907,24 +942,10 @@ const questionOptions = (question?: Question) =>
                 <div className="panel-header">
                   <div>
                     <p className="eyebrow">Creator Tools</p>
-                    <h2>Showrunner console</h2>
-                    <p className="tip">Start rounds, approve invites, and nudge pending guests.</p>
+                    <h2>Game Controls</h2>
+                    <p className="tip">Start rounds and advance the game as players respond.</p>
                   </div>
                   <span className="phase-pill">Admin</span>
-                </div>
-                <div className="admin-metrics">
-                  <div>
-                    <p className="stat-label">Invites sent</p>
-                    <strong>{inviteStats.sent}</strong>
-                  </div>
-                  <div>
-                    <p className="stat-label">Accepted</p>
-                    <strong>{inviteStats.accepted}</strong>
-                  </div>
-                  <div>
-                    <p className="stat-label">Pending</p>
-                    <strong>{inviteStats.pending}</strong>
-                  </div>
                 </div>
                 <div className="admin-actions">
                   {game.status === "LOBBY" && <button onClick={handleStartGame}>Start Game</button>}
@@ -932,42 +953,6 @@ const questionOptions = (question?: Question) =>
                   {!currentRound && game.status !== "COMPLETE" && (
                     <button onClick={handleAdvance}>Next Round</button>
                   )}
-                </div>
-                <div className="pending-list">
-                  <p className="eyebrow">Pending invites</p>
-                  {pendingInvites.length === 0 ? (
-                    <p className="muted">No invites outstanding. Drop more to keep the lobby full.</p>
-                  ) : (
-                    <ul>
-                      {pendingInvites.map((invite) => (
-                        <li key={invite.id}>
-                          <div>
-                            <strong>{invite.inviteeContact}</strong>
-                            <small>Invited by {invite.inviterName}</small>
-                          </div>
-                          <button className="ghost" onClick={() => handleReminder(invite)}>
-                            Poke
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <div className="invite-form inline">
-                  <input
-                    placeholder="Contact name or email"
-                    value={inviteContact}
-                    onChange={(event) => setInviteContact(event.target.value)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      handleCreateInvite(inviteContact);
-                      setInviteContact("");
-                    }}
-                  >
-                    Send invite
-                  </button>
                 </div>
               </div>
             </>
