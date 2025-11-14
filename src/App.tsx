@@ -130,6 +130,12 @@ const fallbackQuestions: Question[] = [
   },
 ];
 
+const sampleLeaderboard = [
+  { name: "Liam (You)", points: 1780, highlight: true },
+  { name: "Chloe W.", points: 1310 },
+  { name: "Noah S.", points: 1090 },
+];
+
 const defaultHostForm: HostFormState = {
   creatorName: "Bandwagon Host",
   inviteMode: "OPEN",
@@ -471,9 +477,63 @@ const questionOptions = (question?: Question) =>
     return () => socket.close();
   }, [session?.gameId]);
 
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   const renderLanding = () => (
-    <section className="grid">
-      <form className="panel wide" onSubmit={handleCreateGame}>
+    <>
+      <section className="landing-hero">
+        <div className="hero-left">
+          <BandwagonWordmark />
+          <div className="avatar-orb" role="img" aria-label="Bandwagon avatar">
+            🎭
+          </div>
+          <p className="player-name">You</p>
+          <p className="player-level">Player level 3</p>
+          <div className="xp-bar">
+            <div className="xp-fill" style={{ width: "65%" }} />
+          </div>
+          <small className="xp-label">XP to level 4</small>
+          <div className="hero-actions">
+            <button type="button" onClick={() => scrollTo("host-setup")}>
+              Start new game
+            </button>
+            <button type="button" className="secondary" onClick={() => scrollTo("join-panel")}>
+              Join with code
+            </button>
+            <button type="button" className="ghost" onClick={() => setNotice("Quick match is coming soon!")}>
+              Quick match
+            </button>
+          </div>
+        </div>
+        <div className="hero-right">
+          <div className="leader-snippet">
+            <div className="leader-headline">
+              <p>Leaderboard</p>
+              <span className="pill hot">Live</span>
+            </div>
+            <ul>
+              {sampleLeaderboard.map((entry, index) => (
+                <li key={entry.name} className={entry.highlight ? "active" : ""}>
+                  <span className="rank">{index + 1}</span>
+                  <div>
+                    <p className="name">{entry.name}</p>
+                    <small>{entry.points} pts</small>
+                  </div>
+                  {entry.highlight && <span className="mint-pill">You</span>}
+                </li>
+              ))}
+            </ul>
+            <p className="view-link" onClick={() => setNotice("Global leaderboard coming soon!")}>
+              View global leaderboard
+            </p>
+          </div>
+        </div>
+      </section>
+      <section className="grid" id="host-setup">
+        <form className="panel wide" onSubmit={handleCreateGame}>
         <div className="panel-header">
           <div>
             <p className="eyebrow">Host A Game</p>
@@ -569,7 +629,7 @@ const questionOptions = (question?: Question) =>
         </div>
       </form>
 
-      <form className="panel" onSubmit={handleJoinGame}>
+      <form className="panel" id="join-panel" onSubmit={handleJoinGame}>
         <div className="panel-header">
           <div>
             <p className="eyebrow">Join Game</p>
@@ -597,6 +657,7 @@ const questionOptions = (question?: Question) =>
         </button>
       </form>
     </section>
+    </>
   );
 
   if (!session || !game) {
@@ -938,6 +999,16 @@ const questionOptions = (question?: Question) =>
 }
 
 export default App;
+
+const BandwagonWordmark = () => (
+  <div className="wordmark" aria-label="Bandwagon">
+    {"BANDWAGON".split("").map((letter, index) => (
+      <span key={`${letter}-${index}`} style={{ "--index": index } as CSSProperties}>
+        {letter}
+      </span>
+    ))}
+  </div>
+);
 
 type ShareToolsProps = {
   gameCode: string;
