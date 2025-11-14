@@ -479,11 +479,6 @@ const questionOptions = (question?: Question) =>
     return () => socket.close();
   }, [session?.gameId]);
 
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
   const renderLanding = () => (
     <>
       <section className="landing-hero-simple">
