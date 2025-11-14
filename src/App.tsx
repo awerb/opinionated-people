@@ -56,6 +56,90 @@ const defaultJoinForm: JoinFormState = {
   inviteId: "",
 };
 
+const fallbackQuestions: Question[] = [
+  {
+    id: "bandwagon-q1",
+    text: "Pick the brunch spot everyone else is picturing.",
+    category: "Food & Drinks",
+    optionA: "Trendy avocado toast café",
+    optionB: "Bottomless mimosa bistro",
+    optionC: "Neighborhood diner",
+    optionD: "Farmers market food truck",
+  },
+  {
+    id: "bandwagon-q2",
+    text: "Which city would most players daydream about visiting right now?",
+    category: "Travel",
+    optionA: "Lisbon",
+    optionB: "Tokyo",
+    optionC: "Mexico City",
+    optionD: "Reykjavík",
+  },
+  {
+    id: "bandwagon-q3",
+    text: "Ultimate comfort show the group binges.",
+    category: "Entertainment",
+    optionA: "The Office",
+    optionB: "Great British Bake Off",
+    optionC: "Bluey",
+    optionD: "Friends",
+  },
+  {
+    id: "bandwagon-q4",
+    text: "Morning beverage vibe check.",
+    category: "Daily Habits",
+    optionA: "Cold brew with oat milk",
+    optionB: "Matcha latte",
+    optionC: "Black coffee",
+    optionD: "Protein smoothie",
+  },
+  {
+    id: "bandwagon-q5",
+    text: "Pick the pop culture moment everyone still quotes.",
+    category: "Pop Culture",
+    optionA: "Beyoncé's Coachella set",
+    optionB: "Barbieheimer summer",
+    optionC: "Succession finale",
+    optionD: "Pedro Pascal meme era",
+  },
+  {
+    id: "bandwagon-q6",
+    text: "Preferred remote work backdrop.",
+    category: "Lifestyle",
+    optionA: "Minimalist studio",
+    optionB: "Lush plant jungle",
+    optionC: "Sunlit beach house",
+    optionD: "Hip coffee shop",
+  },
+  {
+    id: "bandwagon-q7",
+    text: "Which daily habit does this crew brag about?",
+    category: "Habit Tracking",
+    optionA: "10k steps",
+    optionB: "Meditation streak",
+    optionC: "Wordle in 3",
+    optionD: "Cold plunges",
+  },
+  {
+    id: "bandwagon-q8",
+    text: "Preferred group chat reaction style.",
+    category: "Social",
+    optionA: "All emojis all the time",
+    optionB: "Voice notes",
+    optionC: "Memes & gifs",
+    optionD: "Short replies",
+  },
+  {
+    id: "bandwagon-q9",
+    text: "Pick the sneaker everyone flexes.",
+    category: "Fashion",
+    optionA: "Nike Dunks",
+    optionB: "Adidas Sambas",
+    optionC: "New Balance 550s",
+    optionD: "Veja V-10s",
+  },
+];
+
 const readSession = (): Session | null => {
   try {
     const raw = localStorage.getItem(SESSION_KEY);
