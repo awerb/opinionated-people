@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import type { GameInvitation, GameParticipant, GameRound, GameState, InviteMode, Question } from "./api";
