@@ -1,0 +1,148 @@
+// Prisma schema for Opinionated People backend
+
+// generator/client
+generator client {
+  provider = "prisma-client-js"
+}
+
+// datasource
+ datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum GameStatus {
+  LOBBY
+  RUNNING
+  CHAMPIONSHIP
+  COMPLETE
+}
+
+enum RoundStatus {
+  IDLE
+  ACTIVE
+  COMPLETE
+}
+
+enum InviteMode {
+  LOCKED
+  OPEN
+}
+
+enum ParticipantStatus {
+  ACTIVE
+  VOTER
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+}
+
+model User {
+  id        String             @id @default(cuid())
+  username  String
+  email     String?            @unique
+  avatar    String?
+  createdAt DateTime           @default(now())
+  participants GameParticipant[]
+  invitations  Invitation[]    @relation("InviteeUser")
+  createdGames Game[]          @relation("GameCreator")
+}
+
+model Game {
+  id              String           @id @default(cuid())
+  code            String           @unique
+  creatorId       String
+  creator         User             @relation("GameCreator", fields: [creatorId], references: [id])
+  status          GameStatus       @default(LOBBY)
+  inviteMode      InviteMode       @default(LOCKED)
+  prizeAmount     Int              @default(0)
+  generalRoundCount Int            @default(3)
+  finalistCount   Int              @default(3)
+  timerSeconds    Int              @default(45)
+  currentRoundId  String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  rounds          GameRound[]
+  participants    GameParticipant[]
+  invitations     Invitation[]
+
+  @@index([creatorId])
+}
+
+model Question {
+  id        String       @id @default(cuid())
+  text      String
+  category  String
+  optionA   String
+  optionB   String
+  optionC   String
+  optionD   String
+  createdAt DateTime     @default(now())
+  rounds    GameRound[]
+}
+
+model GameRound {
+  id             String       @id @default(cuid())
+  gameId         String
+  game           Game         @relation(fields: [gameId], references: [id])
+  questionId     String
+  question       Question     @relation(fields: [questionId], references: [id])
+  index          Int
+  isChampionship Boolean      @default(false)
+  status         RoundStatus  @default(IDLE)
+  endsAt         DateTime?
+  responses      Response[]
+
+  @@index([gameId])
+}
+
+model GameParticipant {
+  id           String             @id @default(cuid())
+  gameId       String
+  game         Game               @relation(fields: [gameId], references: [id])
+  userId       String
+  user         User               @relation(fields: [userId], references: [id])
+  invitedById  String?
+  invitedBy    GameParticipant?   @relation("InviteTree", fields: [invitedById], references: [id])
+  invitees     GameParticipant[]  @relation("InviteTree")
+  status       ParticipantStatus  @default(ACTIVE)
+  totalPoints  Int                @default(0)
+  isFinalist   Boolean            @default(false)
+  isCreator    Boolean            @default(false)
+  createdAt    DateTime           @default(now())
+  invitations  Invitation[]       @relation("ParticipantInviteOwner")
+  responses    Response[]
+
+  @@unique([gameId, userId])
+  @@index([invitedById])
+}
+
+model Response {
+  id            String          @id @default(cuid())
+  roundId       String
+  round         GameRound       @relation(fields: [roundId], references: [id])
+  participantId String
+  participant   GameParticipant @relation(fields: [participantId], references: [id])
+  selectedOption String
+  createdAt      DateTime       @default(now())
+
+  @@unique([roundId, participantId])
+  @@index([roundId])
+  @@index([participantId])
+}
+
+model Invitation {
+  id             String          @id @default(cuid())
+  gameId         String
+  game           Game            @relation(fields: [gameId], references: [id])
+  inviterId      String
+  inviter        GameParticipant @relation("ParticipantInviteOwner", fields: [inviterId], references: [id])
+  inviteeContact String
+  inviteeUserId  String?
+  inviteeUser    User?           @relation("InviteeUser", fields: [inviteeUserId], references: [id])
+  status         InviteStatus    @default(PENDING)
+  lastReminderAt DateTime?
+  createdAt      DateTime        @default(now())
+}
