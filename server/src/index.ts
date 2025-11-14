@@ -18,8 +18,27 @@ import {
 } from "./gameService";
 
 const app = express();
-const origins = (process.env.CLIENT_ORIGINS ?? "http://localhost:5173").split(",");
-app.use(cors({ origin: origins, credentials: true }));
+const originList = (process.env.CLIENT_ORIGINS ?? "http://localhost:5173")
+  .split(",")
+  .map((entry) => entry.trim())
+  .filter(Boolean);
+
+const corsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+    if (originList.includes("*") || originList.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+    callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 type AsyncHandler = (req: Request, res: Response, next: NextFunction) => Promise<unknown> | unknown;
