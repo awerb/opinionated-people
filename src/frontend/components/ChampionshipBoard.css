@@ -1,0 +1,68 @@
+.championship-board {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.45);
+}
+
+.championship-board header {
+  margin-bottom: 1.5rem;
+}
+
+.championship-board h2 {
+  margin: 0 0 0.25rem;
+}
+
+.championship-board .subtle {
+  color: rgba(226, 232, 240, 0.75);
+}
+
+.championship-board.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.winner-announcement {
+  font-weight: 600;
+  color: #fbbf24;
+}
+
+.finalist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.finalist-card {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.6);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.finalist-card.is-winner {
+  border-color: #fbbf24;
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.6);
+}
+
+.finalist-card:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.finalist-name {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.finalist-score {
+  font-size: 0.9rem;
+  color: rgba(226, 232, 240, 0.8);
+}

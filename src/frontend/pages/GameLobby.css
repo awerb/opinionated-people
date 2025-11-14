@@ -1,0 +1,96 @@
+.game-lobby {
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+}
+
+.game-lobby__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.game-lobby__header h2 {
+  margin: 0;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+  margin: 0 0 0.15rem;
+}
+
+.subtle {
+  color: #6b7280;
+  margin: 0;
+}
+
+.threshold-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.threshold-input input {
+  width: 4rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 1rem;
+  border-radius: 0.4rem;
+  border: 1px solid #d1d5db;
+}
+
+.roster-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.roster-table th,
+.roster-table td {
+  padding: 0.75rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.roster-row.is-eliminated {
+  opacity: 0.6;
+}
+
+.roster-row.is-finalist {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.player-name {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.player-name small {
+  font-size: 0.75rem;
+  color: #dc2626;
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.row-actions button {
+  border: none;
+  background: #f3f4f6;
+  padding: 0.4rem 0.9rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.row-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
