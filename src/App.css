@@ -846,8 +846,135 @@ table.leaderboard {
   transform: translateY(0);
 }
 
+/* Simplified Landing Hero */
+.landing-hero-simple {
+  text-align: center;
+  padding: 3rem 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.landing-hero-simple h1 {
+  margin: 1.5rem 0 1rem;
+  font-size: 2.5rem;
+  font-family: var(--font-display);
+  color: var(--glow);
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: rgba(255, 248, 234, 0.8);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Host and Player Flow Sections */
+.host-flow,
+.player-flow {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.panel.center {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Quick Start Section */
+.quick-start-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 0;
+}
+
+.primary-cta.large {
+  font-size: 1.3rem;
+  padding: 1.25rem 3rem;
+  min-width: 280px;
+}
+
+.or-divider {
+  color: rgba(255, 248, 234, 0.5);
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
+.secondary-link {
+  background: none;
+  border: none;
+  color: var(--azure);
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.5rem 1rem;
+  transition: color 0.2s ease;
+}
+
+.secondary-link:hover {
+  color: var(--mint);
+}
+
+/* Forms */
+.join-form,
+.advanced-form {
+  margin-top: 2rem;
+}
+
+.join-form {
+  max-width: 400px;
+  margin: 2rem auto 0;
+}
+
+.join-form .field {
+  margin-bottom: 1.5rem;
+}
+
+.join-form input {
+  width: 100%;
+  padding: 0.875rem;
+  font-size: 1rem;
+}
+
+.join-form .primary-cta {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.advanced-form {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Responsive improvements for mobile */
 @media (max-width: 640px) {
+  .landing-hero-simple h1 {
+    font-size: 2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .primary-cta.large {
+    font-size: 1.1rem;
+    padding: 1rem 2rem;
+    min-width: 240px;
+  }
+
   .hero-actions button.primary-cta {
     font-size: 1rem;
     padding: 0.9rem 1.2rem;

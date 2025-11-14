@@ -48,91 +48,85 @@ const defaultJoinForm: JoinFormState = {
 const fallbackQuestions: Question[] = [
   {
     id: "bandwagon-q1",
-    text: "Pick the brunch spot everyone else is picturing.",
-    category: "Food & Drinks",
-    optionA: "Trendy avocado toast café",
-    optionB: "Bottomless mimosa bistro",
-    optionC: "Neighborhood diner",
-    optionD: "Farmers market food truck",
+    text: "Favorite pizza topping?",
+    category: "Food",
+    optionA: "Cheese",
+    optionB: "Pepperoni",
+    optionC: "Mushroom",
+    optionD: "Olive",
   },
   {
     id: "bandwagon-q2",
-    text: "Which city would most players daydream about visiting right now?",
-    category: "Travel",
-    optionA: "Lisbon",
-    optionB: "Tokyo",
-    optionC: "Mexico City",
-    optionD: "Reykjavík",
+    text: "Perfect bedtime on a weeknight?",
+    category: "Daily Life",
+    optionA: "9 PM",
+    optionB: "10 PM",
+    optionC: "11 PM",
+    optionD: "Midnight",
   },
   {
     id: "bandwagon-q3",
-    text: "Ultimate comfort show the group binges.",
-    category: "Entertainment",
-    optionA: "The Office",
-    optionB: "Great British Bake Off",
-    optionC: "Bluey",
-    optionD: "Friends",
+    text: "Best snack cracker?",
+    category: "Food",
+    optionA: "Ritz",
+    optionB: "Saltines",
+    optionC: "Triscuits",
+    optionD: "Cheez-Its",
   },
   {
     id: "bandwagon-q4",
-    text: "Morning beverage vibe check.",
-    category: "Daily Habits",
-    optionA: "Cold brew with oat milk",
-    optionB: "Matcha latte",
-    optionC: "Black coffee",
-    optionD: "Protein smoothie",
+    text: "Go-to coffee order?",
+    category: "Drinks",
+    optionA: "Black coffee",
+    optionB: "Latte",
+    optionC: "Cold brew",
+    optionD: "Iced coffee",
   },
   {
     id: "bandwagon-q5",
-    text: "Pick the pop culture moment everyone still quotes.",
-    category: "Pop Culture",
-    optionA: "Beyoncé's Coachella set",
-    optionB: "Barbieheimer summer",
-    optionC: "Succession finale",
-    optionD: "Pedro Pascal meme era",
+    text: "Best sports league to watch?",
+    category: "Sports",
+    optionA: "NFL",
+    optionB: "NBA",
+    optionC: "Premier League",
+    optionD: "MLB",
   },
   {
     id: "bandwagon-q6",
-    text: "Preferred remote work backdrop.",
-    category: "Lifestyle",
-    optionA: "Minimalist studio",
-    optionB: "Lush plant jungle",
-    optionC: "Sunlit beach house",
-    optionD: "Hip coffee shop",
+    text: "Ultimate comfort movie genre?",
+    category: "Entertainment",
+    optionA: "Comedy",
+    optionB: "Rom-com",
+    optionC: "Action",
+    optionD: "Animated",
   },
   {
     id: "bandwagon-q7",
-    text: "Which daily habit does this crew brag about?",
-    category: "Habit Tracking",
-    optionA: "10k steps",
-    optionB: "Meditation streak",
-    optionC: "Wordle in 3",
-    optionD: "Cold plunges",
+    text: "Dream weekend getaway?",
+    category: "Travel",
+    optionA: "Beach",
+    optionB: "Mountain",
+    optionC: "City escape",
+    optionD: "Staycation",
   },
   {
     id: "bandwagon-q8",
-    text: "Preferred group chat reaction style.",
-    category: "Social",
-    optionA: "All emojis all the time",
-    optionB: "Voice notes",
-    optionC: "Memes & gifs",
-    optionD: "Short replies",
+    text: "Best phone notification sound?",
+    category: "Tech",
+    optionA: "Default ding",
+    optionB: "Chime",
+    optionC: "Vibrate only",
+    optionD: "Muted always",
   },
   {
     id: "bandwagon-q9",
-    text: "Pick the sneaker everyone flexes.",
-    category: "Fashion",
-    optionA: "Nike Dunks",
-    optionB: "Adidas Sambas",
-    optionC: "New Balance 550s",
-    optionD: "Veja V-10s",
+    text: "Favorite breakfast carb?",
+    category: "Food",
+    optionA: "Bagel",
+    optionB: "Pancakes",
+    optionC: "Toast",
+    optionD: "Waffles",
   },
-];
-
-const sampleLeaderboard = [
-  { name: "Liam (You)", points: 1780, highlight: true },
-  { name: "Chloe W.", points: 1310 },
-  { name: "Noah S.", points: 1090 },
 ];
 
 const defaultHostForm: HostFormState = {
@@ -189,7 +183,7 @@ function App() {
   const [joinForm, setJoinForm] = useState<JoinFormState>(defaultJoinForm);
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
-  const [landingTab, setLandingTab] = useState<"host" | "player" | "about">("host");
+  const [landingTab, setLandingTab] = useState<"host" | "player" | "how">("host");
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
   const currentRound: GameRound | null = useMemo(() => {
@@ -492,279 +486,187 @@ const questionOptions = (question?: Question) =>
 
   const renderLanding = () => (
     <>
-      <section className="landing-hero">
-        <div className="hero-left">
-          <BandwagonWordmark />
-          <div className="avatar-orb" role="img" aria-label="Bandwagon avatar">
-            🎭
-          </div>
-          <p className="player-name">You</p>
-          <p className="player-level">Player level 3</p>
-          <div className="xp-bar">
-            <div className="xp-fill" style={{ width: "65%" }} />
-          </div>
-          <small className="xp-label">XP to level 4</small>
-          <div className="hero-actions">
-            <button type="button" className="primary-cta" onClick={handleQuickStart} disabled={loading}>
-              {loading ? "Creating..." : "Create Game Now"}
-            </button>
-            <button type="button" className="secondary" onClick={() => scrollTo("join-panel")}>
-              Join with code
-            </button>
-            <button type="button" className="ghost" onClick={() => {
-              setShowAdvancedSettings(true);
-              scrollTo("host-setup");
-            }}>
-              Advanced Setup
-            </button>
-          </div>
-        </div>
-        <div className="hero-right">
-          <div className="leader-snippet">
-            <div className="leader-headline">
-              <p>Leaderboard</p>
-              <span className="pill hot">Live</span>
-            </div>
-            <ul>
-              {sampleLeaderboard.map((entry, index) => (
-                <li key={entry.name} className={entry.highlight ? "active" : ""}>
-                  <span className="rank">{index + 1}</span>
-                  <div>
-                    <p className="name">{entry.name}</p>
-                    <small>{entry.points} pts</small>
-                  </div>
-                  {entry.highlight && <span className="mint-pill">You</span>}
-                </li>
-              ))}
-            </ul>
-            <p className="view-link" onClick={() => setNotice("Global leaderboard coming soon!")}>
-              View global leaderboard
-            </p>
-          </div>
-        </div>
+      <section className="landing-hero-simple">
+        <BandwagonWordmark />
+        <h1>Jump on the Bandwagon</h1>
+        <p className="hero-subtitle">The social prediction game where you guess what the majority will choose. Part psychology, part strategy, pure fun.</p>
       </section>
       <div className="landing-tabs">
         <button type="button" className={landingTab === "host" ? "active" : ""} onClick={() => setLandingTab("host")}>
-          Host
+          Host Game
         </button>
         <button type="button" className={landingTab === "player" ? "active" : ""} onClick={() => setLandingTab("player")}>
-          Player
+          Join Game
         </button>
-        <button type="button" className={landingTab === "about" ? "active" : ""} onClick={() => setLandingTab("about")}>
-          About
+        <button type="button" className={landingTab === "how" ? "active" : ""} onClick={() => setLandingTab("how")}>
+          How It Works
         </button>
       </div>
       {landingTab === "host" && (
-        <section className="grid" id="host-setup">
-        <form className="panel wide" onSubmit={handleCreateGame}>
-        <div className="panel-header">
-          <div>
-            <p className="eyebrow">Host A Game</p>
-            <h2>Custom game setup</h2>
-            <p className="tip">Fine-tune your game settings or use the "Create Game Now" button above for instant setup.</p>
-          </div>
-        </div>
-
-        <div className="advanced-toggle">
-          <button
-            type="button"
-            className="toggle-button"
-            onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
-          >
-            {showAdvancedSettings ? "Hide" : "Show"} Advanced Settings
-          </button>
-        </div>
-
-        {showAdvancedSettings && (
-          <div className="config-grid">
-            <label className="field">
-              <span>Creator name</span>
-              <input
-                value={hostForm.creatorName}
-                onChange={(event) => setHostForm((prev) => ({ ...prev, creatorName: event.target.value }))}
-              />
-            </label>
-            <label className="field">
-              <span>Invite mode</span>
-              <select
-                value={hostForm.inviteMode}
-                onChange={(event) => setHostForm((prev) => ({ ...prev, inviteMode: event.target.value as InviteMode }))}
+        <section className="host-flow">
+          <div className="panel center">
+            <div className="panel-header">
+              <div>
+                <h2>Create Your Game</h2>
+                <p className="tip">Start a game instantly with default settings, or customize everything.</p>
+              </div>
+            </div>
+            <div className="quick-start-section">
+              <button type="button" className="primary-cta large" onClick={handleQuickStart} disabled={loading}>
+                {loading ? "Creating..." : "Create Game Now"}
+              </button>
+              <p className="or-divider">or</p>
+              <button
+                type="button"
+                className="secondary-link"
+                onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
               >
-                <option value="LOCKED">Locked — only creator can invite</option>
-                <option value="OPEN">Open — viral invites on</option>
-              </select>
-            </label>
-            <label className="field">
-              <span>Timer (seconds)</span>
-              <input
-                type="number"
-                min={20}
-                max={90}
-                value={hostForm.timerSeconds}
-                onChange={(event) => setHostForm((prev) => ({ ...prev, timerSeconds: Number(event.target.value) }))}
-              />
-            </label>
-            <label className="field">
-              <span>General rounds</span>
-              <input
-                type="number"
-                min={1}
-                max={5}
-                value={hostForm.generalRoundCount}
-                onChange={(event) => setHostForm((prev) => ({ ...prev, generalRoundCount: Number(event.target.value) }))}
-              />
-            </label>
-            <label className="field">
-              <span>Finalist slots</span>
-              <input
-                type="number"
-                min={2}
-                max={6}
-                value={hostForm.finalistCount}
-                onChange={(event) => setHostForm((prev) => ({ ...prev, finalistCount: Number(event.target.value) }))}
-              />
-            </label>
-            <label className="field">
-              <span>Prize pool</span>
-              <input
-                type="number"
-                min={0}
-                value={hostForm.prizeAmount}
-                onChange={(event) => setHostForm((prev) => ({ ...prev, prizeAmount: Number(event.target.value) }))}
-              />
-            </label>
-          </div>
-        )}
+                {showAdvancedSettings ? "Hide" : "Show"} Advanced Settings
+              </button>
+            </div>
 
-        <div className="question-section">
-          <div className="question-header">
-            <h3>Question Selection</h3>
-            <button
-              type="button"
-              className="select-recommended"
-              onClick={handleSelectRecommended}
-            >
-              Select Recommended ({hostForm.generalRoundCount + 1})
-            </button>
-          </div>
-          <div className="question-list">
-            {questions.map((question) => (
-              <label key={question.id} className="question-item">
-                <input
-                  type="checkbox"
-                  checked={hostForm.questionIds.includes(question.id)}
-                  onChange={() => {
-                    setHostForm((prev) => {
-                      const exists = prev.questionIds.includes(question.id);
-                      if (exists) {
-                        return { ...prev, questionIds: prev.questionIds.filter((id) => id !== question.id) };
-                      }
-                      return { ...prev, questionIds: [...prev.questionIds, question.id] };
-                    });
-                  }}
-                />
-                <div>
-                  <p className="question-category">{question.category}</p>
-                  <p className="question-text">{question.text}</p>
+            {showAdvancedSettings && (
+              <form className="advanced-form" onSubmit={handleCreateGame}>
+                <div className="config-grid">
+                  <label className="field">
+                    <span>Creator name</span>
+                    <input
+                      value={hostForm.creatorName}
+                      onChange={(event) => setHostForm((prev) => ({ ...prev, creatorName: event.target.value }))}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>Invite mode</span>
+                    <select
+                      value={hostForm.inviteMode}
+                      onChange={(event) => setHostForm((prev) => ({ ...prev, inviteMode: event.target.value as InviteMode }))}
+                    >
+                      <option value="LOCKED">Locked — only creator can invite</option>
+                      <option value="OPEN">Open — viral invites on</option>
+                    </select>
+                  </label>
+                  <label className="field">
+                    <span>Timer (seconds)</span>
+                    <input
+                      type="number"
+                      min={20}
+                      max={90}
+                      value={hostForm.timerSeconds}
+                      onChange={(event) => setHostForm((prev) => ({ ...prev, timerSeconds: Number(event.target.value) }))}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>General rounds</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={5}
+                      value={hostForm.generalRoundCount}
+                      onChange={(event) => setHostForm((prev) => ({ ...prev, generalRoundCount: Number(event.target.value) }))}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>Finalist slots</span>
+                    <input
+                      type="number"
+                      min={2}
+                      max={6}
+                      value={hostForm.finalistCount}
+                      onChange={(event) => setHostForm((prev) => ({ ...prev, finalistCount: Number(event.target.value) }))}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>Prize pool</span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={hostForm.prizeAmount}
+                      onChange={(event) => setHostForm((prev) => ({ ...prev, prizeAmount: Number(event.target.value) }))}
+                    />
+                  </label>
                 </div>
-              </label>
-            ))}
-          </div>
-        </div>
-        <div className="config-actions">
-          <button type="submit" disabled={loading}>
-            {loading ? "Creating..." : "Create Custom Game"}
-          </button>
-        </div>
-      </form>
 
-      <form className="panel" id="join-panel" onSubmit={handleJoinGame}>
-        <div className="panel-header">
-          <div>
-            <p className="eyebrow">Join Game</p>
-            <h2>Jump into the guesses</h2>
-            <p className="tip">Enter the 6-letter lobby code from your host.</p>
+                <div className="question-section">
+                  <div className="question-header">
+                    <h3>Question Selection</h3>
+                    <button
+                      type="button"
+                      className="select-recommended"
+                      onClick={handleSelectRecommended}
+                    >
+                      Select Recommended ({hostForm.generalRoundCount + 1})
+                    </button>
+                  </div>
+                  <div className="question-list">
+                    {questions.map((question) => (
+                      <label key={question.id} className="question-item">
+                        <input
+                          type="checkbox"
+                          checked={hostForm.questionIds.includes(question.id)}
+                          onChange={() => {
+                            setHostForm((prev) => {
+                              const exists = prev.questionIds.includes(question.id);
+                              if (exists) {
+                                return { ...prev, questionIds: prev.questionIds.filter((id) => id !== question.id) };
+                              }
+                              return { ...prev, questionIds: [...prev.questionIds, question.id] };
+                            });
+                          }}
+                        />
+                        <div>
+                          <p className="question-category">{question.category}</p>
+                          <p className="question-text">{question.text}</p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div className="config-actions">
+                  <button type="submit" disabled={loading}>
+                    {loading ? "Creating..." : "Create Custom Game"}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
-        </div>
-        <label className="field">
-          <span>Display name</span>
-          <input value={joinForm.username} onChange={(event) => setJoinForm((prev) => ({ ...prev, username: event.target.value }))} />
-        </label>
-        <label className="field">
-          <span>Lobby code</span>
-          <input
-            value={joinForm.code}
-            onChange={(event) => setJoinForm((prev) => ({ ...prev, code: event.target.value.toUpperCase() }))}
-          />
-        </label>
-        <label className="field">
-          <span>Invite ID (optional)</span>
-          <input value={joinForm.inviteId} onChange={(event) => setJoinForm((prev) => ({ ...prev, inviteId: event.target.value }))} />
-        </label>
-        <button type="submit" disabled={loading}>
-          {loading ? "Joining..." : "Join lobby"}
-        </button>
-      </form>
-    </section>
-      )}
-      {landingTab === "player" && (
-        <section className="grid">
-          <div className="panel wide">
-            <div className="panel-header">
-              <div>
-                <p className="eyebrow">Player Lobby</p>
-                <h2>Jump onto the Bandwagon</h2>
-                <p className="tip">Bring the code your host gave you and predict like the crowd.</p>
-              </div>
-            </div>
-            <div className="player-how">
-              <article>
-                <h3>Join fast</h3>
-                <ul>
-                  <li>Tap “Join lobby” and enter the 6-letter code</li>
-                  <li>Pick a fun nickname and confirm</li>
-                  <li>Watch for the host to start the round</li>
-                </ul>
-              </article>
-              <article>
-                <h3>Play smart</h3>
-                <ul>
-                  <li>You’re not voting for yourself—you’re guessing the majority</li>
-                  <li>30–60 seconds per question, so trust your gut</li>
-                  <li>If you fall behind, cheer on finalists as a voter</li>
-                </ul>
-              </article>
-            </div>
-          </div>
-          <form className="panel" onSubmit={handleJoinGame}>
-            <div className="panel-header">
-              <div>
-                <p className="eyebrow">Join Game</p>
-                <h2>Enter lobby details</h2>
-              </div>
-            </div>
-            <label className="field">
-              <span>Display name</span>
-              <input value={joinForm.username} onChange={(event) => setJoinForm((prev) => ({ ...prev, username: event.target.value }))} />
-            </label>
-            <label className="field">
-              <span>Lobby code</span>
-              <input
-                value={joinForm.code}
-                onChange={(event) => setJoinForm((prev) => ({ ...prev, code: event.target.value.toUpperCase() }))}
-              />
-            </label>
-            <label className="field">
-              <span>Invite ID (optional)</span>
-              <input value={joinForm.inviteId} onChange={(event) => setJoinForm((prev) => ({ ...prev, inviteId: event.target.value }))} />
-            </label>
-            <button type="submit" disabled={loading}>
-              {loading ? "Joining..." : "Join lobby"}
-            </button>
-          </form>
         </section>
       )}
-      {landingTab === "about" && (
+      {landingTab === "player" && (
+        <section className="player-flow">
+          <div className="panel center">
+            <div className="panel-header">
+              <div>
+                <h2>Join a Game</h2>
+                <p className="tip">Enter the game code from your host to join the fun.</p>
+              </div>
+            </div>
+            <form className="join-form" onSubmit={handleJoinGame}>
+              <label className="field">
+                <span>Your Name</span>
+                <input
+                  value={joinForm.username}
+                  onChange={(event) => setJoinForm((prev) => ({ ...prev, username: event.target.value }))}
+                  placeholder="Enter your name"
+                  autoFocus
+                />
+              </label>
+              <label className="field">
+                <span>Game Code</span>
+                <input
+                  value={joinForm.code}
+                  onChange={(event) => setJoinForm((prev) => ({ ...prev, code: event.target.value.toUpperCase() }))}
+                  placeholder="6-letter code"
+                  maxLength={6}
+                />
+              </label>
+              <button type="submit" disabled={loading} className="primary-cta">
+                {loading ? "Joining..." : "Join Game"}
+              </button>
+            </form>
+          </div>
+        </section>
+      )}
+      {landingTab === "how" && (
         <section className="grid">
           <div className="panel wide">
             <div className="panel-header">
@@ -817,54 +719,8 @@ const questionOptions = (question?: Question) =>
           <div className="grid-overlay" />
         </div>
         <div className="app-shell">
-          <header className="hero">
-            <div>
-              <p className="eyebrow">Bandwagon</p>
-              <h1>Jump on the Bandwagon.</h1>
-              <p className="lede">
-                The social prediction game where you never vote for your favorite—you predict the majority. Part psychology, part strategy,
-                pure social fun. Spin up a lobby, invite at least four friends, and crown the best crowd reader.
-              </p>
-            </div>
-          </header>
           {notice && <p className="banner">{notice}</p>}
           {renderLanding()}
-          <section className="grid">
-            <div className="panel wide">
-              <div className="panel-header">
-                <div>
-                  <p className="eyebrow">How Bandwagon Works</p>
-                  <h2>Part strategy, part social experiment</h2>
-                </div>
-              </div>
-              <div className="how-grid">
-                <article>
-                  <h3>Setup</h3>
-                  <ul>
-                    <li>Host starts a game & invites at least four friends</li>
-                    <li>Pick questions from the bank & optionally add a prize</li>
-                    <li>Everyone receives the same questions in order</li>
-                  </ul>
-                </article>
-                <article>
-                  <h3>Gameplay</h3>
-                  <ul>
-                    <li>30-60 seconds to choose the answer you think most people will pick</li>
-                    <li>Majority scorers earn 1 point; minority gets zero</li>
-                    <li>Predict psychology, not personal favorites</li>
-                  </ul>
-                </article>
-                <article>
-                  <h3>Winning</h3>
-                  <ul>
-                    <li>Top scorers advance to finals; others become voters</li>
-                    <li>Finalists face elimination—one wrong answer and you&apos;re out</li>
-                    <li>Last predictor standing wins bragging rights and the cash pot</li>
-                  </ul>
-                </article>
-              </div>
-            </div>
-          </section>
         </div>
       </div>
     );
