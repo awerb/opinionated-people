@@ -40,16 +40,6 @@ type JoinFormState = {
   inviteId: string;
 };
 
-const defaultHostForm: HostFormState = {
-  creatorName: "Bandwagon Host",
-  inviteMode: "OPEN",
-  timerSeconds: 45,
-  generalRoundCount: 3,
-  finalistCount: 3,
-  prizeAmount: 250,
-  questionIds: [],
-};
-
 const defaultJoinForm: JoinFormState = {
   username: "Guest",
   code: "",
@@ -140,6 +130,16 @@ const fallbackQuestions: Question[] = [
   },
 ];
 
+const defaultHostForm: HostFormState = {
+  creatorName: "Bandwagon Host",
+  inviteMode: "OPEN",
+  timerSeconds: 45,
+  generalRoundCount: 3,
+  finalistCount: 3,
+  prizeAmount: 250,
+  questionIds: fallbackQuestions.slice(0, 4).map((question) => question.id),
+};
+
 const readSession = (): Session | null => {
   try {
     const raw = localStorage.getItem(SESSION_KEY);
@@ -179,7 +179,7 @@ const useCountdown = (targetDate: string | null) => {
 function App() {
   const [session, setSession] = useState<Session | null>(() => readSession());
   const [game, setGame] = useState<GameState | null>(null);
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<Question[]>(fallbackQuestions);
   const [hostForm, setHostForm] = useState<HostFormState>(defaultHostForm);
   const [joinForm, setJoinForm] = useState<JoinFormState>(defaultJoinForm);
   const [inviteContact, setInviteContact] = useState("");
@@ -433,14 +433,21 @@ const questionOptions = (question?: Question) =>
   useEffect(() => {
     fetchQuestions()
       .then((list) => {
-        setQuestions(list);
+        const usable = list.length > 0 ? list : fallbackQuestions;
+        setQuestions(usable);
         setHostForm((prev) => {
-          if (prev.questionIds.length > 0) return prev;
-          const defaults = list.slice(0, prev.generalRoundCount + 1).map((question) => question.id);
-          return { ...prev, questionIds: defaults };
+          const existing = prev.questionIds.length > 0 ? prev.questionIds : usable.slice(0, prev.generalRoundCount + 1).map((question) => question.id);
+          return { ...prev, questionIds: existing };
         });
+        if (list.length === 0) {
+          setNotice("Using Bandwagon starter questions while the database syncs.");
+        }
       })
-      .catch((error) => setNotice((error as Error).message));
+      .catch(() => {
+        setQuestions(fallbackQuestions);
+        setHostForm((prev) => ({ ...prev, questionIds: fallbackQuestions.slice(0, prev.generalRoundCount + 1).map((question) => question.id) }));
+        setNotice("Couldn’t reach the question bank, showing sample prompts instead.");
+      });
   }, []);
 
   useEffect(() => {
