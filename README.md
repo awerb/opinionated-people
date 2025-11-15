@@ -1,73 +1,54 @@
-# React + TypeScript + Vite
+# Opinionated People
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A lightweight React + TypeScript prototype that explores an interactive "Opinionated People" game loop. The current build renders a centered landing screen with a **Start Game** button and provides the scaffolding for expanding into richer gameplay while allowing QA to validate the UI shell early.
 
-Currently, two official plugins are available:
+## Prerequisites
+- **Node.js**: 18.18.0 or 20.9.0 and newer (matches Vite 7.x engine requirements)
+- **npm**: 9.x or 10.x (ships with the supported Node LTS releases)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Verify your versions with `node -v` and `npm -v` before installing dependencies.
 
-## React Compiler
+## Project setup
+1. Install packages:
+   ```bash
+   npm install
+   ```
+2. Start the development server with hot module reloading:
+   ```bash
+   npm run dev
+   ```
+3. Create a production build (runs TypeScript project references and bundles with Vite):
+   ```bash
+   npm run build
+   ```
+4. Preview the production build locally:
+   ```bash
+   npm run preview
+   ```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+> The Vite dev server and preview server both default to [http://localhost:5173](http://localhost:5173). Pass `--host` or `--port` flags if you need to bind to a different interface.
 
-## Expanding the ESLint configuration
+## How to play / test
+1. Launch the dev server (`npm run dev`) and open the app in your browser.
+2. You should see a full-height page with the "Opinionated People" title, a "Prototype build" subtitle, and a single **Start Game** button centered on the screen.
+3. Click **Start Game**:
+   - The browser console should immediately log `Start game clicked` (this is currently the primary success signal for QA).
+   - No navigation or UI state changes occur yet; the button remains available so you can click multiple times to confirm repeated logs.
+4. Inputs available in this milestone:
+   - Mouse / touch interaction with the **Start Game** button.
+   - Keyboard navigation (tab to the button and press `Enter` or `Space`).
+5. Outcomes to verify until the full gameplay UI ships:
+   - Ensure the page renders without runtime errors in the console before interaction.
+   - Confirm the log message appears exactly once per click or key activation.
+   - Validate the layout remains centered at common desktop widths (768–1440px) and that the button remains accessible via keyboard focus.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Document any deviations (missing log, unexpected errors, misaligned layout) so future gameplay work can reproduce the state reliably.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Troubleshooting
+- **Dev server not reachable**: Confirm `npm run dev` reports `Local: http://localhost:5173/`. If another process already uses that port, append `--port 5174` (or similar) to the script: `npm run dev -- --port 5174`.
+- **Blank page or runtime errors**: Open the browser devtools console (⌘+Option+J on macOS, Ctrl+Shift+J on Windows/Linux) and capture any stack traces. The `handleStart` logic currently only logs to the console, so any additional errors likely stem from build or dependency issues.
+- **Build failures**: Run `npm run build -- --debug` to see verbose Vite output, or `npx tsc --noEmit` to isolate TypeScript diagnostics.
+- **Stale dependencies**: Delete `node_modules` and `package-lock.json`, reinstall with `npm install`, and retry the command.
+- **Inspecting server logs**: All dev server logs appear directly in the terminal running `npm run dev`. Leave that session open while testing so you can capture warnings (e.g., ESLint hints) alongside browser console logs.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+By following these steps, contributors and QA can consistently install, run, and verify the current Opinionated People prototype while we continue iterating on gameplay features.
